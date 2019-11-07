@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ratingsdata")
 public class RatingsResource {
     
-//    @RequestMapping("/{movieId}")
-//    public Rating getRating(@PathVariable("movieId") String movieId){
-//        return new Rating( movieId, 4 );
-//    }
+    @RequestMapping("/{movieId}")
+    public Rating getRating(@PathVariable("movieId") String movieId){
+        return new Rating( movieId, 4 );
+    }
     
     @RequestMapping("/users/{userId}")
     public UserRating getUserRating(@PathVariable("userId") String userId){

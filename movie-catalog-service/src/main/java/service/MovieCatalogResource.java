@@ -6,7 +6,7 @@ package service;
 import model.Rating;
 import model.Movie;
 import java.util.Arrays;
-import service.CatalogItem;
+import model.CatalogItem;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,12 +37,6 @@ public class MovieCatalogResource {
     @RequestMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId){
         
-        // get all rated movieIds
-//        List<Rating> ratings = Arrays.asList( 
-//                new Rating("1234", 4),
-//                new Rating("5678", 3)
-//        );
-        
         UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
         
         // foreach movieId, call MovieInfoService and get movie details 
@@ -54,7 +48,12 @@ public class MovieCatalogResource {
                     
                     }).collect(Collectors.toList());
         
-
+//        Asynchronous version:
+//        webClientBuilder.build()
+//                        .get()
+//                        .uri(s: "http:localhost:8081/movies/" + rating.getMovieId())
+//                        .retrieve()
+//                        .bodyToMono(Movie.class)
 
     }
 }

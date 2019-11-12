@@ -3,6 +3,7 @@ package service;
 
 
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import model.Rating;
 import model.Movie;
 import java.util.Arrays;
@@ -35,14 +36,13 @@ public class MovieCatalogResource {
     private RestTemplate restTemplate;
     
     @RequestMapping("/{userId}")
+    @HystrixCommand(fallbackMethod = "getFallbackCatalog")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId){
         
-        UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
+        UserRating ratings = restTemplate.getForObject("http://ratings-data-service/ratingsdata/users/" + userId, UserRating.class);
         
-        // foreach movieId, call MovieInfoService and get movie details 
-        // stream().map() lets you convert an object to something else
         return ratings.getUserRating().stream().map(rating -> {
-            Movie movie = restTemplate.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
+            Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
             
             return new CatalogItem(movie.getName(), "movie " + movie.getMovieId(), rating.getRating());
                     
@@ -55,5 +55,10 @@ public class MovieCatalogResource {
 //                        .retrieve()
 //                        .bodyToMono(Movie.class)
 
+    }
+    
+    // The fallback method for hystrix for when the servers get overloaded 
+    public List<CatalogItem> getFallbackCatalog(@PathVariable("userId") String userId){
+        return Arrays.asList(new CatalogItem("No movie", "", 0));
     }
 }

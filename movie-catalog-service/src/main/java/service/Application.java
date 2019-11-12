@@ -8,10 +8,14 @@ package service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -26,11 +30,17 @@ import org.springframework.web.client.RestTemplate;
 // Tells Spring to start adding beans based on classpath settings, other beans, 
 // and various property settings. 
 @EnableAutoConfiguration
+@EnableEurekaClient
+@EnableCircuitBreaker
 public class Application {
     
     @Bean
+    @LoadBalanced
     public RestTemplate getRestTemplate(){
-        return new RestTemplate();
+        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = 
+                new HttpComponentsClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(3000);
+        return new RestTemplate(clientHttpRequestFactory);
     }
     
     public static void main(String[] args){

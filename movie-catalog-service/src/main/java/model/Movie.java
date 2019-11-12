@@ -12,12 +12,22 @@ package model;
 public class Movie {
     private String movieId;
     private String name;
+    private String desc;
     
     protected Movie(){}
 
     public Movie(String movieId, String name) {
         this.movieId = movieId;
         this.name = name;
+        this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
     
     public String getMovieId() {

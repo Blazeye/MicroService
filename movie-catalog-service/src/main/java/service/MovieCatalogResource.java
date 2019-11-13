@@ -3,9 +3,6 @@ package service;
 
 
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import model.Rating;
-import model.Movie;
 import java.util.Arrays;
 import model.CatalogItem;
 import java.util.List;

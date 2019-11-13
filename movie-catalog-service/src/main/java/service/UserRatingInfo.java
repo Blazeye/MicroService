@@ -6,6 +6,7 @@
 package service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import java.util.Arrays;
 import model.Rating;
 import model.UserRating;
@@ -24,7 +25,17 @@ public class UserRatingInfo {
     @Autowired
     private RestTemplate restTemplate;
     
-    @HystrixCommand(fallbackMethod = "getFallbackUserRating")
+    @HystrixCommand(fallbackMethod = "getFallbackUserRating",
+            commandProperties = {
+                // Timeout is 2s
+                @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+                // Checks 5 consecutive threads for timeouts
+                @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+                // Percentage of checked threads in timeout, which triggers circuit break
+                @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+                // Sleeps for 5s after circuit break 
+                @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+            })
     public UserRating getUserRating(@PathVariable("userId") String userId) {
         return restTemplate.getForObject("http://ratings-data-service/ratingsdata/users/" + userId, UserRating.class);
     }
